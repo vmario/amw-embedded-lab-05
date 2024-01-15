@@ -1,9 +1,30 @@
-#include "gpio.hpp"
+#include "shifter.hpp"
+
+#include <avr/io.h>
+
+#define DDR_SDI DDRB ///< Rejestr kierunku pinu danych.
+#define DDR_CLOCK DDRD ///< Rejestr kierunku zegarów.
+
+#define PORT_SDI PORTB ///< Wyjście pinu danych.
+#define PORT_CLOCK PORTD ///< Wyjście zegarów.
+
+const Shifter shifter;
+
+namespace {
+/**
+ * Numery pinów sterujących rejestrem przesuwnym.
+ */
+enum PIN {
+	PIN_SDI = 0, ///< Dane wejściowe.
+	PIN_CLOCK_SHIFT = 7, ///< Taktowanie danych.
+	PIN_CLOCK_LATCH = 4, ///< Zatrzask.
+};
+}
 
 /**
  * Inicjalizuje porty GPIO.
  */
-void gpioInitialize()
+void Shifter::initialize() const
 {
 	DDR_SDI = _BV(PIN_SDI);
 	DDR_CLOCK = _BV(PIN_CLOCK_SHIFT) | _BV(PIN_CLOCK_LATCH);
@@ -14,7 +35,7 @@ void gpioInitialize()
  *
  * @param byte Bajt umieszczany w rejestrze.
  */
-void shiftByte(uint8_t byte)
+void Shifter::shift(uint8_t byte) const
 {
 	for (uint8_t i = 0; i < 8; ++i) {
 		if (byte & 0x01) {
@@ -33,7 +54,7 @@ void shiftByte(uint8_t byte)
 /**
  * Zatrzaskuje dane (przepisuje je na wyjście).
  */
-void latchData()
+void Shifter::latch() const
 {
 	PORT_CLOCK |= _BV(PIN_CLOCK_LATCH);
 	PORT_CLOCK &= ~_BV(PIN_CLOCK_LATCH);

@@ -1,14 +1,31 @@
 #pragma once
 
-#include <avr/io.h>
+#include <stdint.h>
 
 /**
  * Liczba cyfr na wyświetlaczu.
  */
 constexpr uint8_t DISPLAY_SIZE{4};
 
-extern const uint8_t FONT[];
+/**
+ * Sterownik wyświetlacza siedmiosegmentowego.
+ */
+struct Display {
+	/**
+	 * Odświeża wyświetlacz.
+	 */
+	void refresh() const;
 
-extern uint8_t DIGITS[DISPLAY_SIZE];
+	/**
+	 * Drukuje liczbę do bufora wyświetlacza.
+	 *
+	 * @param number Liczba do wyświetlenia.
+	 * @param dot Pozycja kropki dziesiętnej.
+	 */
+	void print(uint16_t number, uint8_t dot=DISPLAY_SIZE) const;
+};
 
-void refreshDisplay();
+/**
+ * Globalna instancja sterownika wyświetlacza.
+ */
+extern const Display display;
